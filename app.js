@@ -1,22 +1,6 @@
-// =========================================================================
-// 1. GLOBAL SUPABASE INITIALIZATION WITH ACCIDENT PREVENTATIVE FALLBACK
-// =========================================================================
-const SUPABASE_URL = "wipukqfwzfihpjvuonld"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpcHVrcWZ3emZpaHBqdnVvbmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNDQ1MjksImV4cCI6MjA5NjkyMDUyOX0.fAtJ5QZ-OpY59W-GO0iJFvuOn1BQh9bqh8aPKRYan58";
-
-let supabase = null;
-// Prevent crashes if placeholder text strings are left unedited
-if (SUPABASE_URL.includes("your-project-id") === false && typeof supabase !== 'undefined') {
-    supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-
-// =========================================================================
-// 2. DOM ELEMENT UI REFERENCES
-// =========================================================================
+// UI Elements
 const btnRecord = document.getElementById('btn-record');
 const btnStop = document.getElementById('btn-stop');
-const btnSubmit = document.getElementById('btn-submit');
-const btnDownload = document.getElementById('btn-download');
 const timerDisplay = document.getElementById('timer');
 const statusTag = document.getElementById('status-tag');
 const previewSection = document.getElementById('preview-section');
@@ -25,120 +9,91 @@ const metaForm = document.getElementById('meta-form');
 const canvas = document.getElementById('visualizer-canvas');
 const canvasCtx = canvas.getContext('2d');
 
-// Gain elements
-const gainSlider = document.getElementById('gain-slider');
-const gainValueDisplay = document.getElementById('gain-value');
-
-// =========================================================================
-// 3. STATE TRACKING MATRICES
-// =========================================================================
+// State Variables
 let mediaRecorder = null;
 let audioChunks = [];
 let timerInterval = null;
 let secondsElapsed = 0;
 let audioBlob = null;
 
-// Audio context nodes
+// Visualizer State Variables
 let audioCtx = null;
 let analyser = null;
-let gainNode = null; 
-let streamDestination = null; 
 let dataArray = null;
 let source = null;
 let animationFrameId = null;
 
-// =========================================================================
-// 4. EVENT LISTENERS
-// =========================================================================
+// Event Listeners
 btnRecord.addEventListener('click', startRecording);
 btnStop.addEventListener('click', stopRecording);
-metaForm.addEventListener('submit', handleFormSubmission);
 
-gainSlider.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value);
-    gainValueDisplay.textContent = val.toFixed(1) + 'x';
-    // Dynamically adjust hardware audio amplification value if recording is live
-    if (gainNode) {
-        gainNode.gain.setValueAtTime(val, audioCtx.currentTime);
-    }
-});
+// Handle submission safely if form layout exists
+if (metaForm) {
+    metaForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert("Local testing mode active! To save files online, choose a storage provider next.");
+    });
+}
 
 function resizeCanvas() {
+    if (!canvas) return;
     canvas.width = canvas.clientWidth * window.devicePixelRatio;
     canvas.height = canvas.clientHeight * window.devicePixelRatio;
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// =========================================================================
-// 5. IMPLEMENTATION DRIVERS
-// =========================================================================
-
 async function startRecording() {
     audioChunks = [];
-    
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 48000 } 
+            audio: { echoCancellation: true, noiseSuppression: true } 
         });
 
-        // Initialize Audio context environment
+        // Set up local canvas audio mapping visualizer
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Setup nodes: Input Stream -> Gain Node -> Analyser -> Output Destination Stream
-        source = audioCtx.createMediaStreamSource(stream);
-        gainNode = audioCtx.createGain();
         analyser = audioCtx.createAnalyser();
-        streamDestination = audioContextDestination = audioCtx.createMediaStreamDestination(); // Generates a clean output target stream
-
         analyser.fftSize = 128;
-        
-        // Set volume boost factor directly from current position on our HTML slider component
-        gainNode.gain.setValueAtTime(parseFloat(gainSlider.value), audioCtx.currentTime);
+        source = audioCtx.createMediaStreamSource(stream);
+        source.connect(analyser);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-        // Core graph routing connections
-        source.connect(gainNode);
-        gainNode.connect(analyser);
-        analyser.connect(streamDestination); // Route amplified audio directly into the destination capture line
-
-        const bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-
-        // Map MediaRecorder targeting our clean amplified destination track line instead of raw mic
-        mediaRecorder = new MediaRecorder(streamDestination.stream);
+        mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
-        mediaRecorder.onstop = processAudioOutput;
-        
-        mediaRecorder.start();
+        mediaRecorder.onstop = () => {
+            audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            audioPreview.src = audioUrl;
+            
+            const btnDownload = document.getElementById('btn-download');
+            if (btnDownload) {
+                btnDownload.href = audioUrl;
+                btnDownload.setAttribute('download', `local-take.wav`);
+            }
+            previewSection.classList.remove('hidden');
+        };
 
+        mediaRecorder.start();
         updateUIState(true);
         startTimer();
         drawVisualizer();
 
     } catch (error) {
-        console.error('Recording initialization failure context:', error);
-        alert('Could not start recorder. Please check browser microphone security preferences.');
+        console.error('Microphone Access Blocked:', error);
+        alert('Browser Blocked Microphone! Check the URL bar or host this page on GitHub Pages to test.');
     }
 }
 
 function drawVisualizer() {
     animationFrameId = requestAnimationFrame(drawVisualizer);
-    if (!analyser) return;
-
-    const bufferLength = analyser.frequencyBinCount;
+    if (!analyser || !canvasCtx) return;
     analyser.getByteFrequencyData(dataArray);
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const barWidth = (canvas.width / bufferLength) * 1.5;
-    let barHeight;
+    const barWidth = (canvas.width / analyser.frequencyBinCount) * 1.5;
     let x = 0;
-
-    for (let i = 0; i < bufferLength; i++) {
-        barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
-        const gradient = canvasCtx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
-        gradient.addColorStop(0, '#00f2fe');
-        gradient.addColorStop(1, '#ff3366');
-        canvasCtx.fillStyle = gradient;
+    for (let i = 0; i < analyser.frequencyBinCount; i++) {
+        let barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
+        canvasCtx.fillStyle = '#00f2fe';
         canvasCtx.fillRect(x, canvas.height - barHeight, barWidth - 4, barHeight);
         x += barWidth;
     }
@@ -146,87 +101,12 @@ function drawVisualizer() {
 
 function stopRecording() {
     if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
-
     mediaRecorder.stop();
-    
-    // Disconnect active routing connections
-    if (source) source.disconnect();
-    
+    mediaRecorder.stream.getTracks().forEach(track => track.stop());
     updateUIState(false);
     stopTimer();
-
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     if (audioCtx) audioCtx.close();
-    
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function processAudioOutput() {
-    audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
-    const audioUrl = URL.createObjectURL(audioBlob);
-    
-    audioPreview.src = audioUrl;
-    btnDownload.href = audioUrl;
-    
-    const extension = mediaRecorder.mimeType.includes('mp4') ? 'm4a' : 
-                      mediaRecorder.mimeType.includes('webm') ? 'webm' : 'wav';
-    btnDownload.setAttribute('download', `amplified-take.${extension}`);
-
-    previewSection.classList.remove('hidden');
-}
-
-async function handleFormSubmission(event) {
-    event.preventDefault();
-
-    if (!audioBlob) return alert('No valid recording asset tracking available.');
-    
-    // Safety exit clause if database endpoints are unconfigured
-    if (!supabase) {
-        alert("Local simulation bypass: Audio captured successfully! Connect your actual Supabase credentials in app.js code configuration.");
-        console.log("Local metadata package bypass execution:", {
-            recorderName: document.getElementById('user-name').value,
-            trackTitle: document.getElementById('track-title').value,
-            blobSize: audioBlob.size
-        });
-        return;
-    }
-
-    const userName = document.getElementById('user-name').value.trim();
-    const trackTitle = document.getElementById('track-title').value.trim();
-
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = "Processing Cloud Save...";
-
-    const fileExtension = mediaRecorder.mimeType.includes('mp4') ? 'm4a' : 
-                          mediaRecorder.mimeType.includes('webm') ? 'webm' : 'wav';
-    const uniqueFilename = `track_${Date.now()}.${fileExtension}`;
-
-    try {
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('audio-recordings')
-            .upload(uniqueFilename, audioBlob, { cacheControl: '3600', upsert: false, contentType: audioBlob.type });
-
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrlData } = supabase.storage.from('audio-recordings').getPublicUrl(uniqueFilename);
-        const absoluteAudioUrl = publicUrlData.publicUrl;
-
-        const { error: dbError } = await supabase
-            .from('submissions')
-            .insert([{ recorder_name: userName, track_title: trackTitle, audio_url: absoluteAudioUrl }]);
-
-        if (dbError) throw dbError;
-
-        alert(`Success!\nAudio and metadata saved permanently to your Supabase cloud database.`);
-        metaForm.reset();
-        previewSection.classList.add('hidden');
-
-    } catch (err) {
-        alert(`Upload error context pipeline failure: ${err.message || err}`);
-    } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = "Submit Track";
-    }
 }
 
 function updateUIState(isRecording) {
@@ -246,32 +126,15 @@ function updateUIState(isRecording) {
     }
 }
 
-
-
-
-/**
- * Visual Display Timing Calculations
- */
 function startTimer() {
     secondsElapsed = 0;
     timerDisplay.textContent = '00:00';
-    
     timerInterval = setInterval(() => {
         secondsElapsed++;
         const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
         const secs = String(secondsElapsed % 60).padStart(2, '0');
-        
-        // Notice the backticks (`) used here instead of standard quotes:
         timerDisplay.textContent = `${mins}:${secs}`;
     }, 1000);
 }
 
-function stopTimer() { 
-    clearInterval(timerInterval); 
-}
-
-
-
-
-
-                                const secs = String(secondsElapsed % 60).padStart(2, '0');timerDisplay.textContent = ${mins}:${secs};}, 1000);}function stopTimer() { clearInterval(timerInterval); }
+function stopTimer() { clearInterval(timerInterval); }
