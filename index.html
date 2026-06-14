@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Audio Recorder & Database Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="recorder-container">
+        <header class="recorder-header">
+            <h1>Studio Recorder</h1>
+            <span id="status-tag" class="status-tag idle">Ready</span>
+        </header>
+
+        <!-- Visualizer Frame Section -->
+        <div class="visualizer-container">
+            <div id="timer" class="timer">00:00</div>
+            <!-- Canvas layer for live frequency soundwave rendering -->
+            <canvas id="visualizer-canvas" class="visualizer-canvas"></canvas>
+        </div>
+
+        <!-- System Controls Trigger Section -->
+        <div class="controls-container">
+            <button id="btn-record" class="btn btn-record" title="Start Recording">
+                <span class="icon-dot"></span> Record
+            </button>
+            <button id="btn-stop" class="btn btn-stop" disabled title="Stop Recording">
+                Stop
+            </button>
+        </div>
+
+        <!-- Output Preview & User Metadata Form Section -->
+        <div id="preview-section" class="preview-section hidden">
+            <h3>Latest Recording</h3>
+            <audio id="audio-preview" controls></audio>
+            
+            
+            <form id="meta-form" class="meta-form">
+                <div class="form-group">
+                    <label for="user-name">Your Name</label>
+                    <input type="text" id="user-name" placeholder="e.g. John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="track-title">Track Title / Description</label>
+                    <input type="text" id="track-title" placeholder="e.g. Vocal Take 1" required>
+                </div>
+
+                <div class="action-buttons">
+                    <a id="btn-download" class="btn btn-download" download="recording.wav">Download File</a>
+                    <button type="submit" id="btn-submit" class="btn btn-submit">Submit Track</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Core Cloud Dependencies & Framework Engine Script Links -->
+    <script src="https://jsdelivr.net"></script>
+    <script src="app.js"></script>
+</body>
+</html>
