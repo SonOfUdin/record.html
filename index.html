@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Audio Recorder & Database Platform</title>
+    <title>LIN206 Onlive Audio Recorder</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="recorder-container">
         <header class="recorder-header">
-            <h1>Studio Recorder</h1>
+            <h1>Online Recorder</h1>
             <span id="status-tag" class="status-tag idle">Ready</span>
         </header>
 
@@ -46,20 +46,36 @@
             
             <form id="meta-form" class="meta-form">
                 <div class="form-group">
-                    <label for="user-name">Your Name</label>
-                    <input type="text" id="user-name" placeholder="e.g. John Doe" required>
+                    <label for="user-name">Your Name (Surname First)</label>
+                    <input type="text" id="user-name" placeholder="e.g. Ekiugbo Philip" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="track-title">Track Title / Description</label>
-                    <input type="text" id="track-title" placeholder="e.g. Vocal Take 1" required>
-                </div>
+        <label for="track-title">Question Answered in Recording</label>
+        <input type="text" id="track-title" placeholder="e.g. Question 1" required>
+    </div>
+               <!-- Added Language Selection Component -->
+    <div class="form-group">
+        <label for="audio-language">Language</label>
+        <select id="audio-language" required>
+            <option value="" disabled selected>Select your language...</option>
+            <option value="Edo">Edo</option>
+            <option value="Esan">Esan</option>
+            <option value="Etsako">Etsako</option>
+            <option value="Yoruba">Yoruba</option>
+            <option value="Igbo">Igbo</option>
+            <option value="Hausa">Hausa</option>
+            <option value="Urhobo">Urhobo</option>
+                        <option value="Igbanke">Igbanke</option>
+        </select>
+    </div>
 
-                <div class="action-buttons">
-                    <a id="btn-download" class="btn btn-download" download="recording.wav">Download File</a>
-                    <button type="submit" id="btn-submit" class="btn btn-submit">Submit Track</button>
-                </div>
-            </form>
+    <div class="action-buttons">
+        <a id="btn-download" class="btn btn-download" download="recording.wav">Download</a>
+        <button type="submit" id="btn-submit" class="btn btn-submit">Submit Track</button>
+    </div>
+</form>
+            
         </div>
     </div>
 
