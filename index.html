@@ -21,16 +21,23 @@
             <canvas id="visualizer-canvas" class="visualizer-canvas"></canvas>
         </div>
 
-        <!-- System Controls Trigger Section -->
-        <div class="controls-container">
-            <button id="btn-record" class="btn btn-record" title="Start Recording">
-                <span class="icon-dot"></span> Record
-            </button>
-            <button id="btn-stop" class="btn btn-stop" disabled title="Stop Recording">
-                Stop
-            </button>
-        </div>
+        <!-- System Controls Trigger Section with Gain Slider -->
+<div class="controls-container">
+    <button id="btn-record" class="btn btn-record" title="Start Recording">
+        <span class="icon-dot"></span> Record
+    </button>
+    <button id="btn-stop" class="btn btn-stop" disabled title="Stop Recording">
+        Stop
+    </button>
+</div>
 
+<!-- NEW: Audio Amplification Control Knob Block -->
+<div class="gain-control-wrapper">
+    <label for="gain-slider">Input Gain: <span id="gain-value">1.0x</span></label>
+    <input type="range" id="gain-slider" min="0.5" max="3.0" step="0.1" value="1.0">
+</div>
+
+        
         <!-- Output Preview & User Metadata Form Section -->
         <div id="preview-section" class="preview-section hidden">
             <h3>Latest Recording</h3>
