@@ -246,16 +246,29 @@ function updateUIState(isRecording) {
     }
 }
 
+
+
+
+/**
+ * Visual Display Timing Calculations
+ */
 function startTimer() {
     secondsElapsed = 0;
     timerDisplay.textContent = '00:00';
+    
     timerInterval = setInterval(() => {
         secondsElapsed++;
         const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(secondsElapsed % 60).padStart(2, '0');
+        
+        // Notice the backticks (`) used here instead of standard quotes:
+        timerDisplay.textContent = `${mins}:${secs}`;
+    }, 1000);
+}
 
-
-
-
+function stopTimer() { 
+    clearInterval(timerInterval); 
+}
 
 
 
