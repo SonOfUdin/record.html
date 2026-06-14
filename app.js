@@ -1,8 +1,8 @@
 // =========================================================================
 // 1. GLOBAL SUPABASE INITIALIZATION WITH ACCIDENT PREVENTATIVE FALLBACK
 // =========================================================================
-const SUPABASE_URL = "https://supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-anon-key";
+const SUPABASE_URL = "wipukqfwzfihpjvuonld"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpcHVrcWZ3emZpaHBqdnVvbmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNDQ1MjksImV4cCI6MjA5NjkyMDUyOX0.fAtJ5QZ-OpY59W-GO0iJFvuOn1BQh9bqh8aPKRYan58";
 
 let supabase = null;
 // Prevent crashes if placeholder text strings are left unedited
