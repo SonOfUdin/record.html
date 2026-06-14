@@ -1,0 +1,218 @@
+/* Reset & Base Foundation Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #0f111a;
+    color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Master Platform Card Layout */
+.recorder-container {
+    background-color: #1a1d2e;
+    border: 1px solid #2e344e;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Header Context Configurations */
+.recorder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.recorder-header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.status-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+}
+
+.status-tag.idle { background-color: #2d3748; color: #a0aec0; }
+.status-tag.recording { background-color: #742a2a; color: #feb2b2; animation: pulse 1.5s infinite; }
+
+/* Visualizer Container & Digital Timer Layout */
+.visualizer-container {
+    background-color: #0b0c16;
+    border-radius: 12px;
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 1px solid #1f233b;
+}
+
+.timer {
+    font-size: 2.5rem;
+    font-family: monospace;
+    font-weight: bold;
+    color: #00f2fe;
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 20px rgba(15, 17, 26, 0.9);
+    z-index: 2; /* Keeps timer numbers above visualizer bars */
+}
+
+/* Canvas Integration */
+.visualizer-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Controls Execution Module Buttons */
+.controls-container {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.btn-record { background-color: #ff3366; color: white; }
+.btn-record:hover:not(:disabled) { background-color: #e02454; }
+
+.icon-dot {
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.btn-stop { background-color: #3a3f58; color: white; }
+.btn-stop:hover:not(:disabled) { background-color: #4a5070; }
+
+/* Interactive Preview & Metadata Identity Form View */
+.preview-section {
+    border-top: 1px solid #2e344e;
+    padding-top: 20px;
+    animation: fadeIn 0.4s ease;
+}
+
+.preview-section h3 {
+    font-size: 0.9rem;
+    color: #a0aec0;
+    margin-bottom: 12px;
+}
+
+audio {
+    width: 100%;
+    margin-bottom: 16px;
+    border-radius: 8px;
+}
+
+.meta-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.form-group input {
+    background-color: #0b0c16;
+    border: 1px solid #2e344e;
+    color: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #00f2fe;
+    box-shadow: 0 0 5px rgba(0, 242, 254, 0.2);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-download {
+    background-color: #24283b;
+    border: 1px solid #414868;
+    color: #c0caf5;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.btn-download:hover { background-color: #2f344d; }
+
+.btn-submit { background-color: #00f2fe; color: #0f111a; }
+.btn-submit:hover { background-color: #00d8e4; }
+
+.hidden { display: none !important; }
+
+/* Functional Visual Animation Matrices */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
