@@ -113,13 +113,17 @@ function drawVisualizer() {
 }
 
 function stopRecording() {
+    // 1. IMMEDIATELY halt the timer clock from ticking forward
+    stopTimer();
+
     if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
 
+    // 2. Stop the hardware media capture streams
     mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Release mic light indicator
+    mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Shuts off privacy light indicator
     
+    // 3. Reset your visual states and clean up the canvas animations
     updateUIState(false);
-    stopTimer();
 
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     if (audioCtx) audioCtx.close();
