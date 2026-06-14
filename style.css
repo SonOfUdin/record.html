@@ -216,3 +216,36 @@ audio {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* Input Boost Slider Styling */
+.gain-control-wrapper {
+    background-color: #0b0c16;
+    border: 1px solid #1f233b;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.gain-control-wrapper label {
+    font-size: 0.85rem;
+    color: #a0aec0;
+    font-weight: 600;
+}
+
+.gain-control-wrapper input[type="range"] {
+    flex: 1;
+    accent-color: #00f2fe;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
