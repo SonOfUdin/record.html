@@ -2,8 +2,8 @@
 // 1. GLOBAL SUPABASE CREDENTIAL INITIALIZATION
 // Make sure to replace these placeholder strings with your real project credentials
 // =========================================================================
-const SUPABASE_URL = "https://supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-anon-key";
+const SUPABASE_URL = "https://wipukqfwzfihpjvuonld.supabase.co"; 
+const SUPABASE_ANON_KEY = "sb_publishable_e6qCFdUBD_Echs7cbEWb6w_RW9BVqrg";
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
