@@ -1,11 +1,14 @@
 // =========================================================================
-// 1. GLOBAL SUPABASE CREDENTIAL INITIALIZATION
-// Make sure to replace these placeholder strings with your real project credentials
+// 1. GLOBAL SUPABASE INITIALIZATION WITH ACCIDENT PREVENTATIVE FALLBACK
 // =========================================================================
-const SUPABASE_URL = "https://wipukqfwzfihpjvuonld.supabase.co"; 
-const SUPABASE_ANON_KEY = "sb_publishable_e6qCFdUBD_Echs7cbEWb6w_RW9BVqrg";
+const SUPABASE_URL = "https://supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-anon-key";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase = null;
+// Prevent crashes if placeholder text strings are left unedited
+if (SUPABASE_URL.includes("your-project-id") === false && typeof supabase !== 'undefined') {
+    supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
 
 // =========================================================================
 // 2. DOM ELEMENT UI REFERENCES
@@ -22,8 +25,12 @@ const metaForm = document.getElementById('meta-form');
 const canvas = document.getElementById('visualizer-canvas');
 const canvasCtx = canvas.getContext('2d');
 
+// Gain elements
+const gainSlider = document.getElementById('gain-slider');
+const gainValueDisplay = document.getElementById('gain-value');
+
 // =========================================================================
-// 3. APPLICATION STATE TRACKERS
+// 3. STATE TRACKING MATRICES
 // =========================================================================
 let mediaRecorder = null;
 let audioChunks = [];
@@ -31,56 +38,74 @@ let timerInterval = null;
 let secondsElapsed = 0;
 let audioBlob = null;
 
-// Web Audio API context tracking nodes
+// Audio context nodes
 let audioCtx = null;
 let analyser = null;
+let gainNode = null; 
+let streamDestination = null; 
 let dataArray = null;
 let source = null;
 let animationFrameId = null;
 
 // =========================================================================
-// 4. CORE ENGINE EVENT LISTENERS
+// 4. EVENT LISTENERS
 // =========================================================================
 btnRecord.addEventListener('click', startRecording);
 btnStop.addEventListener('click', stopRecording);
 metaForm.addEventListener('submit', handleFormSubmission);
 
-// Recalculate canvas grid dimensions fluidly to prevent blurring
+gainSlider.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    gainValueDisplay.textContent = val.toFixed(1) + 'x';
+    // Dynamically adjust hardware audio amplification value if recording is live
+    if (gainNode) {
+        gainNode.gain.setValueAtTime(val, audioCtx.currentTime);
+    }
+});
+
 function resizeCanvas() {
     canvas.width = canvas.clientWidth * window.devicePixelRatio;
     canvas.height = canvas.clientHeight * window.devicePixelRatio;
 }
 window.addEventListener('resize', resizeCanvas);
-resizeCanvas(); // Set dimensions on initial startup
+resizeCanvas();
 
 // =========================================================================
-// 5. FUNCTIONAL IMPLMENTATION WORKFLOWS
+// 5. IMPLEMENTATION DRIVERS
 // =========================================================================
 
-/**
- * Boots the audio loop capturing hardware stream nodes
- */
 async function startRecording() {
-    audioChunks = []; // Flush buffer history
+    audioChunks = [];
     
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
             audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 48000 } 
         });
 
-        // Instantiate browser analytical environment pipeline
+        // Initialize Audio context environment
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 128; // Keep frequency bar count stylised and visible
         
+        // Setup nodes: Input Stream -> Gain Node -> Analyser -> Output Destination Stream
         source = audioCtx.createMediaStreamSource(stream);
-        source.connect(analyser);
+        gainNode = audioCtx.createGain();
+        analyser = audioCtx.createAnalyser();
+        streamDestination = audioContextDestination = audioCtx.createMediaStreamDestination(); // Generates a clean output target stream
+
+        analyser.fftSize = 128;
+        
+        // Set volume boost factor directly from current position on our HTML slider component
+        gainNode.gain.setValueAtTime(parseFloat(gainSlider.value), audioCtx.currentTime);
+
+        // Core graph routing connections
+        source.connect(gainNode);
+        gainNode.connect(analyser);
+        analyser.connect(streamDestination); // Route amplified audio directly into the destination capture line
 
         const bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
 
-        // Configure system native file package recording engine
-        mediaRecorder = new MediaRecorder(stream);
+        // Map MediaRecorder targeting our clean amplified destination track line instead of raw mic
+        mediaRecorder = new MediaRecorder(streamDestination.stream);
         mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
         mediaRecorder.onstop = processAudioOutput;
         
@@ -88,25 +113,20 @@ async function startRecording() {
 
         updateUIState(true);
         startTimer();
-        drawVisualizer(); // Launch rendering frame loops
+        drawVisualizer();
 
     } catch (error) {
-        console.error('Hardware profile capture fault:', error);
-        alert('Could not open audio tracks. Please enable microphone permissions in your security panel.');
+        console.error('Recording initialization failure context:', error);
+        alert('Could not start recorder. Please check browser microphone security preferences.');
     }
 }
 
-/**
- * Real-Time Canvas Render Loop
- */
 function drawVisualizer() {
     animationFrameId = requestAnimationFrame(drawVisualizer);
-
     if (!analyser) return;
 
     const bufferLength = analyser.frequencyBinCount;
     analyser.getByteFrequencyData(dataArray);
-
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
     const barWidth = (canvas.width / bufferLength) * 1.5;
@@ -115,27 +135,22 @@ function drawVisualizer() {
 
     for (let i = 0; i < bufferLength; i++) {
         barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
-
-        // Custom Studio Gradient: Cyan fading upwards into Neon Crimson spikes
         const gradient = canvasCtx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
         gradient.addColorStop(0, '#00f2fe');
         gradient.addColorStop(1, '#ff3366');
-
         canvasCtx.fillStyle = gradient;
         canvasCtx.fillRect(x, canvas.height - barHeight, barWidth - 4, barHeight);
-
         x += barWidth;
     }
 }
 
-/**
- * Halts ongoing hardware audio data ingestion
- */
 function stopRecording() {
     if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
 
     mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Shuts off user browser privacy hardware light
+    
+    // Disconnect active routing connections
+    if (source) source.disconnect();
     
     updateUIState(false);
     stopTimer();
@@ -143,12 +158,9 @@ function stopRecording() {
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     if (audioCtx) audioCtx.close();
     
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height); // Clear remaining paint artifacts
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-/**
- * Prepares the audio artifact array compilation file references
- */
 function processAudioOutput() {
     audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
     const audioUrl = URL.createObjectURL(audioBlob);
@@ -156,83 +168,67 @@ function processAudioOutput() {
     audioPreview.src = audioUrl;
     btnDownload.href = audioUrl;
     
-    // Assign proper cross-platform container tag extensions
     const extension = mediaRecorder.mimeType.includes('mp4') ? 'm4a' : 
                       mediaRecorder.mimeType.includes('webm') ? 'webm' : 'wav';
-    btnDownload.setAttribute('download', `studio-take.${extension}`);
+    btnDownload.setAttribute('download', `amplified-take.${extension}`);
 
     previewSection.classList.remove('hidden');
 }
 
-/**
- * Secure Unified Database & Object Cloud Upload Entry Pipeline
- */
 async function handleFormSubmission(event) {
-    event.preventDefault(); // Halt standard site reloads
+    event.preventDefault();
 
-    if (!audioBlob) return alert('No recorded audio instance found.');
+    if (!audioBlob) return alert('No valid recording asset tracking available.');
+    
+    // Safety exit clause if database endpoints are unconfigured
+    if (!supabase) {
+        alert("Local simulation bypass: Audio captured successfully! Connect your actual Supabase credentials in app.js code configuration.");
+        console.log("Local metadata package bypass execution:", {
+            recorderName: document.getElementById('user-name').value,
+            trackTitle: document.getElementById('track-title').value,
+            blobSize: audioBlob.size
+        });
+        return;
+    }
 
     const userName = document.getElementById('user-name').value.trim();
     const trackTitle = document.getElementById('track-title').value.trim();
 
     btnSubmit.disabled = true;
-    btnSubmit.textContent = "Processing...";
+    btnSubmit.textContent = "Processing Cloud Save...";
 
     const fileExtension = mediaRecorder.mimeType.includes('mp4') ? 'm4a' : 
                           mediaRecorder.mimeType.includes('webm') ? 'webm' : 'wav';
     const uniqueFilename = `track_${Date.now()}.${fileExtension}`;
 
     try {
-        // LAYER A: Upload the raw binary file package to the cloud storage bucket
-        btnSubmit.textContent = "Uploading audio asset...";
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from('audio-recordings')
-            .upload(uniqueFilename, audioBlob, { 
-                cacheControl: '3600', 
-                upsert: false, 
-                contentType: audioBlob.type 
-            });
+            .upload(uniqueFilename, audioBlob, { cacheControl: '3600', upsert: false, contentType: audioBlob.type });
 
         if (uploadError) throw uploadError;
 
-        // LAYER B: Extract the permanent public web address url link for that file asset
-        const { data: publicUrlData } = supabase.storage
-            .from('audio-recordings')
-            .getPublicUrl(uniqueFilename);
-
+        const { data: publicUrlData } = supabase.storage.from('audio-recordings').getPublicUrl(uniqueFilename);
         const absoluteAudioUrl = publicUrlData.publicUrl;
 
-        // LAYER C: Inject metadata schema row into the permanent database table logs
-        btnSubmit.textContent = "Saving form entries...";
-        const { data: dbData, error: dbError } = await supabase
+        const { error: dbError } = await supabase
             .from('submissions')
-            .insert([
-                { 
-                    recorder_name: userName, 
-                    track_title: trackTitle, 
-                    audio_url: absoluteAudioUrl 
-                }
-            ]);
+            .insert([{ recorder_name: userName, track_title: trackTitle, audio_url: absoluteAudioUrl }]);
 
         if (dbError) throw dbError;
 
-        alert(`Success!\nAudio and metadata saved permanently to your Supabase instance.`);
-        
+        alert(`Success!\nAudio and metadata saved permanently to your Supabase cloud database.`);
         metaForm.reset();
         previewSection.classList.add('hidden');
 
     } catch (err) {
-        console.error("Pipeline breakdown:", err);
-        alert(`Submission failed: ${err.message || err}`);
+        alert(`Upload error context pipeline failure: ${err.message || err}`);
     } finally {
         btnSubmit.disabled = false;
         btnSubmit.textContent = "Submit Track";
     }
 }
 
-/**
- * UI State Transitions
- */
 function updateUIState(isRecording) {
     if (isRecording) {
         document.body.classList.add('is-recording');
@@ -250,18 +246,19 @@ function updateUIState(isRecording) {
     }
 }
 
-/**
- * Visual Display Timing Calculations
- */
 function startTimer() {
     secondsElapsed = 0;
     timerDisplay.textContent = '00:00';
     timerInterval = setInterval(() => {
         secondsElapsed++;
         const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-        const secs = String(secondsElapsed % 60).padStart(2, '0');
-        timerDisplay.textContent = `${mins}:${secs}`;
-    }, 1000);
-}
 
-function stopTimer() { clearInterval(timerInterval); }
+
+
+
+
+
+
+
+
+                                const secs = String(secondsElapsed % 60).padStart(2, '0');timerDisplay.textContent = ${mins}:${secs};}, 1000);}function stopTimer() { clearInterval(timerInterval); }
