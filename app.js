@@ -2,7 +2,7 @@ javascript// ===================================================================
 // 1. FREE SUPABASE CONFIGURATION (NO CREDIT CARD REQUIRED)
 // Changed variable name to 'supabaseClient' to fix the declaration crash
 // =========================================================================
-const SUPABASE_URL = ""https://ydvfmbvdxgtjtvowmdfj.supabase.co"; 
+const SUPABASE_URL = "https://ydvfmbvdxgtjtvowmdfj.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdmZtYnZkeGd0anR2b3dtZGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjI1ODcsImV4cCI6MjA5NzAzODU4N30.ihE4GMKmG2f4E9M7xliSH1VvZ3wCiuXw56RLreQNIgU";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
