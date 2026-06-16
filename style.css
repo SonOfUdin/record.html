@@ -1,4 +1,4 @@
-/* Reset & Base Foundation Styles */
+css/* Reset Core Base Rules */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -16,7 +16,7 @@ body {
     padding: 20px;
 }
 
-/* Master Platform Card Layout */
+/* Platform Wrapper Shell */
 .recorder-container {
     background-color: #1a1d2e;
     border: 1px solid #2e344e;
@@ -27,7 +27,7 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Header Context Configurations */
+/* Status Headers */
 .recorder-header {
     display: flex;
     justify-content: space-between;
@@ -53,7 +53,7 @@ body {
 .status-tag.idle { background-color: #2d3748; color: #a0aec0; }
 .status-tag.recording { background-color: #742a2a; color: #feb2b2; animation: pulse 1.5s infinite; }
 
-/* Visualizer Container & Digital Timer Layout */
+/* Visualizer Frame & Timer Coordinates */
 .visualizer-container {
     background-color: #0b0c16;
     border-radius: 12px;
@@ -74,10 +74,9 @@ body {
     font-weight: bold;
     color: #00f2fe;
     text-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 20px rgba(15, 17, 26, 0.9);
-    z-index: 2; /* Keeps timer numbers above visualizer bars */
+    z-index: 2; /* Forces text layers above active bars canvas */
 }
 
-/* Canvas Integration */
 .visualizer-canvas {
     position: absolute;
     top: 0;
@@ -88,7 +87,7 @@ body {
     pointer-events: none;
 }
 
-/* Controls Execution Module Buttons */
+/* Controller Button Frameworks */
 .controls-container {
     display: flex;
     gap: 16px;
@@ -130,7 +129,7 @@ body {
 .btn-stop { background-color: #3a3f58; color: white; }
 .btn-stop:hover:not(:disabled) { background-color: #4a5070; }
 
-/* Interactive Preview & Metadata Identity Form View */
+/* Form inputs & selections views layout */
 .preview-section {
     border-top: 1px solid #2e344e;
     padding-top: 20px;
@@ -169,17 +168,25 @@ audio {
     font-weight: 600;
 }
 
-.form-group input {
+.form-group input, 
+.form-group select {
     background-color: #0b0c16;
     border: 1px solid #2e344e;
     color: #f8f9fa;
     padding: 12px;
     border-radius: 6px;
     font-size: 0.95rem;
+    width: 100%;
     transition: border-color 0.2s ease;
 }
 
-.form-group input:focus {
+.form-group select option {
+    background-color: #1a1d2e;
+    color: #f8f9fa;
+}
+
+.form-group input:focus, 
+.form-group select:focus {
     outline: none;
     border-color: #00f2fe;
     box-shadow: 0 0 5px rgba(0, 242, 254, 0.2);
@@ -205,7 +212,7 @@ audio {
 
 .hidden { display: none !important; }
 
-/* Functional Visual Animation Matrices */
+/* Native Graphic Animation Transforms */
 @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -216,57 +223,3 @@ audio {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
-
-/* Input Boost Slider Styling */
-.gain-control-wrapper {
-    background-color: #0b0c16;
-    border: 1px solid #1f233b;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-}
-
-.gain-control-wrapper label {
-    font-size: 0.85rem;
-    color: #a0aec0;
-    font-weight: 600;
-}
-
-.gain-control-wrapper input[type="range"] {
-    flex: 1;
-    accent-color: #00f2fe;
-    cursor: pointer;
-}
-
-
-
-/* Update your existing .form-group input rule block to include select elements */
-.form-group input, 
-.form-group select {
-    background-color: #0b0c16;
-    border: 1px solid #2e344e;
-    color: #f8f9fa;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    width: 100%;
-    transition: border-color 0.2s ease;
-}
-
-.form-group input:focus, 
-.form-group select:focus {
-    outline: none;
-    border-color: #00f2fe;
-    box-shadow: 0 0 5px rgba(0, 242, 254, 0.2);
-}
-
-
-
-
-
-
