@@ -1,14 +1,14 @@
 javascript// =========================================================================
-// 1. CLOUD STORAGE CREDENTIAL MATRIX
-// Ensure your Project URL and Anon key match your project dashboard exactly
+// 1. FREE SUPABASE CONFIGURATION (NO CREDIT CARD REQUIRED)
+// Changed variable name to 'supabaseClient' to fix the declaration crash
 // =========================================================================
-const SUPABASE_URL = "https://supabase.co"; 
-const SUPABASE_ANON_KEY = "YOUR_REAL_ANON_KEY_HERE";
+const SUPABASE_URL = ""https://ydvfmbvdxgtjtvowmdfj.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdmZtYnZkeGd0anR2b3dtZGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjI1ODcsImV4cCI6MjA5NzAzODU4N30.ihE4GMKmG2f4E9M7xliSH1VvZ3wCiuXw56RLreQNIgU";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // =========================================================================
-// 2. DOM INTERFACE COMPONENT POINTERS
+// 2. DOM ELEMENT UI REFERENCES
 // =========================================================================
 const btnRecord = document.getElementById('btn-record');
 const btnStop = document.getElementById('btn-stop');
@@ -23,7 +23,7 @@ const canvas = document.getElementById('visualizer-canvas');
 const canvasCtx = canvas ? canvas.getContext('2d') : null;
 
 // =========================================================================
-// 3. MASTER APPLICATION CONTAINER ENTRIES
+// 3. SECURE APPLICATION STATE MATRIX
 // =========================================================================
 let mediaRecorder = null;
 let audioChunks = [];
@@ -38,7 +38,7 @@ let source = null;
 let animationFrameId = null;
 
 // =========================================================================
-// 4. BIND ACTION CAPTURE TRIGGERS
+// 4. ACTION DRIVEN EVENT LISTENERS
 // =========================================================================
 if (btnRecord) btnRecord.addEventListener('click', startRecording);
 if (btnStop) btnStop.addEventListener('click', stopRecording);
@@ -50,28 +50,27 @@ function resizeCanvas() {
     canvas.height = canvas.clientHeight * window.devicePixelRatio;
 }
 window.addEventListener('resize', resizeCanvas);
-resizeCanvas(); // Calibrate visual matrix bounds upon frame load
+resizeCanvas(); 
 
 // =========================================================================
-// 5. INTERACTIVE FUNCTION CORE LOGIC
+// 5. ENGINE IMPLEMENTATION LOGIC
 // =========================================================================
 
 async function startRecording() {
-    audioChunks = []; // Clean up historical records buffer tracks
+    audioChunks = [];
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
             audio: { echoCancellation: true, noiseSuppression: true } 
         });
 
-        // Setup real time audio listener canvas graphics
         if (canvasCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 128; 
+            analyser.fftSize = 128;
             source = audioCtx.createMediaStreamSource(stream);
             source.connect(analyser);
             dataArray = new Uint8Array(analyser.frequencyBinCount);
-            drawVisualizer(); // Fire analytical painter frame loop
+            drawVisualizer();
         }
 
         mediaRecorder = new MediaRecorder(stream);
@@ -83,21 +82,18 @@ async function startRecording() {
         startTimer();
 
     } catch (error) {
-        console.error('System Device Core Blocked:', error);
-        alert('Microphone Blocked! Push your project folder online to your secure HTTPS GitHub Pages link to run.');
+        console.error('System Access Denied:', error);
+        alert('Microphone blocked! Ensure you are running on GitHub Pages over HTTPS.');
     }
 }
 
 function drawVisualizer() {
     animationFrameId = requestAnimationFrame(drawVisualizer);
     if (!analyser || !canvasCtx) return;
-    
     analyser.getByteFrequencyData(dataArray);
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-    
     const barWidth = (canvas.width / analyser.frequencyBinCount) * 1.5;
     let x = 0;
-    
     for (let i = 0; i < analyser.frequencyBinCount; i++) {
         let barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
         canvasCtx.fillStyle = '#00f2fe';
@@ -107,11 +103,11 @@ function drawVisualizer() {
 }
 
 function stopRecording() {
-    stopTimer(); // Instantly stops the timer counter numbers from ticking
+    stopTimer(); 
     if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
 
     mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Shuts off system mic hardware alert bulb
+    mediaRecorder.stream.getTracks().forEach(track => track.stop());
     updateUIState(false);
 
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -125,34 +121,32 @@ function processAudioOutput() {
     if (audioPreview) audioPreview.src = audioUrl;
     if (btnDownload) {
         btnDownload.href = audioUrl;
-        btnDownload.setAttribute('download', 'recording.wav');
+        btnDownload.setAttribute('download', 'take.wav');
     }
     if (previewSection) previewSection.classList.remove('hidden');
 }
 
-// =========================================================================
-// 6. STORAGE PIPELINE CONNECTIONS
-// =========================================================================
-
+/**
+ * Uploads data smoothly using 'supabaseClient'
+ */
 async function handleSupabaseUpload(event) {
-    event.preventDefault(); // Secure form standard redirects from reloading
-    if (!audioBlob) return alert('Data fault: Audio track asset empty.');
+    event.preventDefault();
+    if (!audioBlob) return alert('No audio file found.');
 
     const userName = document.getElementById('user-name').value.trim();
     const trackTitle = document.getElementById('track-title').value.trim();
     const trackLanguage = document.getElementById('audio-language').value;
 
     btnSubmit.disabled = true;
-    btnSubmit.textContent = "Processing...";
+    btnSubmit.textContent = "Uploading...";
 
     const fileExtension = mediaRecorder.mimeType.includes('mp4') ? 'm4a' : 
                           mediaRecorder.mimeType.includes('webm') ? 'webm' : 'wav';
     const uniqueFilename = `track_${Date.now()}.${fileExtension}`;
 
     try {
-        // STEP A: Fire raw recording array bytes to Object bucket
-        btnSubmit.textContent = "Uploading file track...";
-        const { data: storageData, error: storageError } = await supabase.storage
+        btnSubmit.textContent = "Uploading audio file...";
+        const { data: storageData, error: storageError } = await supabaseClient.storage
             .from('audio-recordings')
             .upload(uniqueFilename, audioBlob, {
                 cacheControl: '3600',
@@ -162,16 +156,14 @@ async function handleSupabaseUpload(event) {
 
         if (storageError) throw storageError;
 
-        // STEP B: Generate permanent reference cloud link URL for that asset
-        const { data: publicUrlData } = supabase.storage
+        const { data: publicUrlData } = supabaseClient.storage
             .from('audio-recordings')
             .getPublicUrl(uniqueFilename);
 
         const absoluteAudioUrl = publicUrlData.publicUrl;
 
-        // STEP C: Insert parameters row array package right into Database table structure logs
-        btnSubmit.textContent = "Logging text metadata...";
-        const { data: tableData, error: tableError } = await supabase
+        btnSubmit.textContent = "Saving data records...";
+        const { data: tableData, error: tableError } = await supabaseClient
             .from('audio_submissions')
             .insert([
                 {
@@ -184,23 +176,19 @@ async function handleSupabaseUpload(event) {
 
         if (tableError) throw tableError;
 
-        alert(`Success!\nRecording submitted by ${userName} has been saved into your database columns.`);
+        alert(`Success!\nTrack recorded by ${userName} has been saved into your database columns.`);
         
         metaForm.reset();
         if (previewSection) previewSection.classList.add('hidden');
 
     } catch (err) {
-        console.error("Cloud processing pipeline dropped context:", err);
-        alert(`Process blocked: ${err.message || err}`);
+        console.error("Upload failure:", err);
+        alert(`Upload failed: ${err.message || err}`);
     } finally {
         btnSubmit.disabled = false;
         btnSubmit.textContent = "Submit Track";
     }
 }
-
-// =========================================================================
-// 7. INTERACTIVE DISPLAY ADJUSTMENTS
-// =========================================================================
 
 function updateUIState(isRecording) {
     if (isRecording) {
