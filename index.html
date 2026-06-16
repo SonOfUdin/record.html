@@ -1,92 +1,82 @@
-<!DOCTYPE html>
+html<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIN206 Onlive Audio Recorder</title>
+    <title>Studio Recorder Platform</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="recorder-container">
         <header class="recorder-header">
-            <h1>Online Recorder</h1>
+            <h1>Studio Recorder</h1>
             <span id="status-tag" class="status-tag idle">Ready</span>
         </header>
 
-        <!-- Visualizer Frame Section -->
+        <!-- Waveform visualizer container frame -->
         <div class="visualizer-container">
             <div id="timer" class="timer">00:00</div>
-            <!-- Canvas layer for live frequency soundwave rendering -->
             <canvas id="visualizer-canvas" class="visualizer-canvas"></canvas>
         </div>
 
-        <!-- System Controls Trigger Section with Gain Slider -->
-<div class="controls-container">
-    <button id="btn-record" class="btn btn-record" title="Start Recording">
-        <span class="icon-dot"></span> Record
-    </button>
-    <button id="btn-stop" class="btn btn-stop" disabled title="Stop Recording">
-        Stop
-    </button>
-</div>
+        <!-- Master system interactive buttons buttons -->
+        <div class="controls-container">
+            <button id="btn-record" class="btn btn-record" title="Start Recording">
+                <span class="icon-dot"></span> Record
+            </button>
+            <button id="btn-stop" class="btn btn-stop" disabled title="Stop Recording">
+                Stop
+            </button>
+        </div>
 
-<!-- NEW: Audio Amplification Control Knob Block -->
-<div class="gain-control-wrapper">
-    <label for="gain-slider">Input Gain: <span id="gain-value">1.0x</span></label>
-    <input type="range" id="gain-slider" min="0.5" max="3.0" step="0.1" value="1.0">
-</div>
-
-        
-        <!-- Output Preview & User Metadata Form Section -->
+        <!-- Preview and metadata metadata configuration cards -->
         <div id="preview-section" class="preview-section hidden">
             <h3>Latest Recording</h3>
             <audio id="audio-preview" controls></audio>
             
-            
             <form id="meta-form" class="meta-form">
                 <div class="form-group">
-                    <label for="user-name">Your Name (Surname First)</label>
-                    <input type="text" id="user-name" placeholder="e.g. Ekiugbo Philip" required>
+                    <label for="user-name">Your Name</label>
+                    <input type="text" id="user-name" placeholder="e.g. John Doe" required>
                 </div>
                 
                 <div class="form-group">
-        <label for="track-title">Question Answered in Recording</label>
-        <input type="text" id="track-title" placeholder="e.g. Question 1" required>
-    </div>
-               <!-- Added Language Selection Component -->
-    <div class="form-group">
-        <label for="audio-language">Language</label>
-        <select id="audio-language" required>
-            <option value="" disabled selected>Select your language...</option>
-            <option value="Edo">Edo</option>
-            <option value="Esan">Esan</option>
-            <option value="Etsako">Etsako</option>
-            <option value="Yoruba">Yoruba</option>
-            <option value="Igbo">Igbo</option>
-            <option value="Hausa">Hausa</option>
-            <option value="Urhobo">Urhobo</option>
-                        <option value="Igbanke">Igbanke</option>
-        </select>
-    </div>
+                    <label for="track-title">Track Title / Description</label>
+                    <input type="text" id="track-title" placeholder="e.g. Take 1" required>
+                </div>
 
-    <div class="action-buttons">
-        <a id="btn-download" class="btn btn-download" download="recording.wav">Download</a>
-        <button type="submit" id="btn-submit" class="btn btn-submit">Submit Track</button>
-    </div>
-</form>
-            
+                <div class="form-group">
+                    <label for="audio-language">Language spoken</label>
+                    <select id="audio-language" required>
+                        <option value="" disabled selected>Select your language...</option>
+                        <option value="Edo">Edo</option>
+                        <option value="Esan">Esan</option>
+                        <option value="Etsako">Etsako</option>
+                        <option value="Ibibio">Ibibio</option>
+                        <option value="Igbanke">Igbanke</option>
+                        <option value="Igbo">Igbo</option>
+                        <option value="Isoko">Isoko</option>
+                        <option value="Itsekiri">Itsekiri</option>
+                        <option value="Nigerian Pidgin">Nigerian Pidgin</option>
+                        <option value="Ora">Ora</option>
+                        <option value="Ukwuani">Ukwuani</option>
+                        <option value="Urhobo">Urhobo</option>
+                        <option value="Yoruba">Yoruba</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="action-buttons">
+                    <a id="btn-download" class="btn btn-download" download="recording.wav">Download</a>
+                    <button type="submit" id="btn-submit" class="btn btn-submit">Submit Track</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Core Cloud Dependencies & Framework Engine Script Links -->
-    <!-- 1. REMOVE your broken script tag line -->
-    <!-- <script src="https://jsdelivr.net"></script> -->
-
-    <!-- 2. PASTE this exact full file path link string instead: -->
-    <script src="https://jsdelivr.net"></script>
-    
-    <!-- 3. Your custom controller file must load LAST -->
+    <!-- Official cloud delivery library connection nodes -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 </body>
 </html>
