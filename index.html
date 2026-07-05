@@ -14,13 +14,11 @@
             <span id="status-tag" class="status-tag idle">Ready</span>
         </header>
 
-        <!-- Waveform visualizer container frame -->
         <div class="visualizer-container">
             <div id="timer" class="timer">00:00</div>
             <canvas id="visualizer-canvas" class="visualizer-canvas"></canvas>
         </div>
 
-        <!-- Master system interactive buttons buttons -->
         <div class="controls-container">
             <button id="btn-record" class="btn btn-record" title="Start Recording">
                 <span class="icon-dot"></span> Record
@@ -30,7 +28,6 @@
             </button>
         </div>
 
-        <!-- Preview and metadata metadata configuration cards -->
         <div id="preview-section" class="preview-section hidden">
             <h3>Latest Recording</h3>
             <audio id="audio-preview" controls></audio>
@@ -47,22 +44,15 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="audio-language">Language spoken</label>
+                    <label for="audio-language">Language Spoken</label>
                     <select id="audio-language" required>
                         <option value="" disabled selected>Select your language...</option>
-                        <option value="Edo">Edo</option>
-                        <option value="Esan">Esan</option>
-                        <option value="Etsako">Etsako</option>
-                        <option value="Ibibio">Ibibio</option>
-                        <option value="Igbanke">Igbanke</option>
-                        <option value="Igbo">Igbo</option>
-                        <option value="Isoko">Isoko</option>
-                        <option value="Itsekiri">Itsekiri</option>
-                        <option value="Nigerian Pidgin">Nigerian Pidgin</option>
-                        <option value="Ora">Ora</option>
-                        <option value="Ukwuani">Ukwuani</option>
-                        <option value="Urhobo">Urhobo</option>
+                        <option value="English">English</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="French">French</option>
                         <option value="Yoruba">Yoruba</option>
+                        <option value="Igbo">Igbo</option>
+                        <option value="Hausa">Hausa</option>
                         <option value="Other">Other</option>
                     </select>
                 </div>
@@ -75,18 +65,7 @@
         </div>
     </div>
 
-    <!-- Official cloud delivery library connection nodes -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Only loading your local controller script file -->
     <script src="app.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
