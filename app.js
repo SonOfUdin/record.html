@@ -137,49 +137,45 @@ async function handleGoogleUpload(event) {
     const userName = document.getElementById('user-name').value.trim();
     const trackTitle = document.getElementById('track-title').value.trim();
     const trackLanguage = document.getElementById('audio-language').value;
+    
+    // 1. EXTRACT THE NEW AGE RANGE DROPDOWN VALUE HERE
+    const trackAgeRange = document.getElementById('user-age-range').value;
 
     btnSubmit.disabled = true;
     btnSubmit.textContent = "Uploading to Google Drive...";
 
-    // Helper reader to convert raw binary file bytes to string Base64 text formatting
     const reader = new FileReader();
     reader.readAsDataURL(audioBlob);
     reader.onloadend = async function () {
-        const base64String = reader.result.split(',')[1]; // Strip file meta headers
+        const base64String = reader.result.split(',');
 
-        // Package data payload structure cleanly
+        // 2. INCLUDE THE AGE PARAMETER INSIDE YOUR PAYLOAD
         const payload = {
             name: userName,
             title: trackTitle,
             language: trackLanguage,
+            ageRange: trackAgeRange, // Added key variable path
             audioBase64: base64String,
             mimeType: audioBlob.type
         };
 
-        // Locate this section inside handleGoogleUpload in your app.js file:
-try {
-    // Dispatch payload package to Google Apps Script Endpoint safely
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", // Bypasses browser strict network barriers
-        redirect: "follow", // Mandatory rule for handling Google Apps Script responses
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8" // Protects format transitions
-        },
-        body: JSON.stringify(payload)
-    });
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                redirect: "follow", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
 
-    // Because 'no-cors' limits response insights, give immediate success feedback
-    alert(`Success!\nTrack data dispatched into your Google pipeline loop.`);
-    metaForm.reset();
-    if (previewSection) previewSection.classList.add('hidden');
+            alert(`Success!\nTrack data dispatched into your Google pipeline loop.`);
+            metaForm.reset();
+            if (previewSection) previewSection.classList.add('hidden');
 
-} catch (err) {
-    console.error("Google Pipeline Error:", err);
-    alert(`Upload Failed: ${err.message || err}`);
-}
- 
-        finally {
+        } catch (err) {
+            console.error("Google Pipeline Error:", err);
+            alert(`Upload Failed: ${err.message || err}`);
+        } finally {
             btnSubmit.disabled = false;
             btnSubmit.textContent = "Submit Track";
         }
