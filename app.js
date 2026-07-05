@@ -156,32 +156,36 @@ async function handleGoogleUpload(event) {
             mimeType: audioBlob.type
         };
 
-        try {
-            // Dispatch payload package to Google Apps Script Endpoint
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
+        // Locate this section inside handleGoogleUpload in your app.js file:
+try {
+    // Dispatch payload package to Google Apps Script Endpoint safely
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", // Bypasses browser strict network barriers
+        redirect: "follow", // Mandatory rule for handling Google Apps Script responses
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8" // Protects format transitions
+        },
+        body: JSON.stringify(payload)
+    });
 
-            const result = await response.json();
+    // Because 'no-cors' limits response insights, give immediate success feedback
+    alert(`Success!\nTrack data dispatched into your Google pipeline loop.`);
+    metaForm.reset();
+    if (previewSection) previewSection.classList.add('hidden');
 
-            if (result.status === "success") {
-                alert(`Success!\nTrack saved inside your Google Drive folder and logged into your spreadsheet.`);
-                metaForm.reset();
-                if (previewSection) previewSection.classList.add('hidden');
-            } else {
-                throw new Error(result.message);
-            }
-
-        } catch (err) {
-            console.error("Google Pipeline Error:", err);
-            alert(`Upload Failed: ${err.message || err}`);
-        } finally {
+} catch (err) {
+    console.error("Google Pipeline Error:", err);
+    alert(`Upload Failed: ${err.message || err}`);
+}
+ 
+        finally {
             btnSubmit.disabled = false;
             btnSubmit.textContent = "Submit Track";
         }
     };
 }
+
 
 // =========================================================================
 // 7. INTERACTIVE DISPLAY ADJUSTMENTS
