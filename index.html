@@ -39,21 +39,45 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="track-title">Track Title / Description</label>
-                    <input type="text" id="track-title" placeholder="e.g. Take 1" required>
+                    <label for="track-title">Track Title</label>
+                    <select id="track-title" required>
+                      <option value="" disabled selected>Select your topic...</option>
+                        <option value="Festival">A festival in my culture</option>
+                        <option value="Meal">How to prepare my favourite native food</option>
+                        <option value="Medicine">How to prepare a traditional medicine for treating any ailment</option>
+                        <option value="Marriage">How traditional marriages are done in my culture</option>
+                        <option value="Burial">How traditional burials are conducted in my culture</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="audio-language">Language Spoken</label>
+                    <label for="audio-language">Language</label>
                     <select id="audio-language" required>
                         <option value="" disabled selected>Select your language...</option>
-                        <option value="English">English</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="French">French</option>
-                        <option value="Yoruba">Yoruba</option>
+                        <option value="Edo">Edo</option>
+                        <option value="Esan">Esan</option>
+                        <option value="Etsako">Etsako</option>
+                        <option value="Ibibio">Ibibio</option>
+                        <option value="Igbanke">Igbanke</option>
                         <option value="Igbo">Igbo</option>
-                        <option value="Hausa">Hausa</option>
-                        <option value="Other">Other</option>
+                        <option value="Isoko">Isoko</option>
+                        <option value="Itsekiri">Itsekiri</option>
+                        <option value="Nigerian Pidgin">Nigerian Pidgin</option>
+                        <option value="Ora">Ora</option>
+                        <option value="Ukwuani">Ukwuani</option>
+                        <option value="Urhobo">Urhobo</option>
+                        <option value="Yoruba">Yoruba</option>
+                       <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="age-range">Age Range</label>
+                    <select id="track-title" required>
+                      <option value="" disabled selected>Select your age range...</option>
+                        <option value="14-19">14-19</option>
+                        <option value="20-24">20-24</option>
+                        <option value="25-29">25-29</option>
+                        <option value="30-35">30-35</option>
                     </select>
                 </div>
 
