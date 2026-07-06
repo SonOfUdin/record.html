@@ -1,6 +1,5 @@
 // =========================================================================
 // 1. GOOGLE APPS SCRIPT WEB APP TARGET URL
-// Paste your deployed script web app link between the double quotes below:
 // =========================================================================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/library/d/12kQ3TflxL1bKDRdk1OmbxGMf1gINsrDiMbQyFIQUsEBwjaWOhIwNSuiG/1";
 
@@ -103,7 +102,7 @@ function drawVisualizer() {
 }
 
 function stopRecording() {
-    stopTimer(); // Instantly freezes numbers on screen click
+    stopTimer(); 
     if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
 
     mediaRecorder.stop();
@@ -134,12 +133,21 @@ async function handleGoogleUpload(event) {
     event.preventDefault(); 
     if (!audioBlob) return alert('Audio tracking target asset empty.');
 
-    const userName = document.getElementById('user-name').value.trim();
-    const trackTitle = document.getElementById('track-title').value.trim();
-    const trackLanguage = document.getElementById('audio-language').value;
-    
-    // 1. EXTRACT THE NEW AGE RANGE DROPDOWN VALUE HERE
-    const trackAgeRange = document.getElementById('user-age-range').value;
+    // Fail-safe element selector configuration
+    const nameEl = document.getElementById('user-name');
+    const titleEl = document.getElementById('track-title');
+    const langEl = document.getElementById('audio-language');
+    const ageEl = document.getElementById('user-age-range');
+
+    // Verification checkpoint to alert you if an HTML ID is missing
+    if (!nameEl || !titleEl || !langEl || !ageEl) {
+        return alert("Configuration Error: One or more dropdown/input element IDs could not be found in your index.html file.");
+    }
+
+    const userName = nameEl.value.trim();
+    const trackTitle = titleEl.value.trim();
+    const trackLanguage = langEl.value;
+    const trackAgeRange = ageEl.value;
 
     btnSubmit.disabled = true;
     btnSubmit.textContent = "Uploading to Google Drive...";
@@ -147,14 +155,13 @@ async function handleGoogleUpload(event) {
     const reader = new FileReader();
     reader.readAsDataURL(audioBlob);
     reader.onloadend = async function () {
-        const base64String = reader.result.split(',');
+        const base64String = reader.result;
 
-        // 2. INCLUDE THE AGE PARAMETER INSIDE YOUR PAYLOAD
         const payload = {
             name: userName,
             title: trackTitle,
             language: trackLanguage,
-            ageRange: trackAgeRange, // Added key variable path
+            ageRange: trackAgeRange,
             audioBase64: base64String,
             mimeType: audioBlob.type
         };
@@ -164,7 +171,9 @@ async function handleGoogleUpload(event) {
                 method: "POST",
                 mode: "no-cors", 
                 redirect: "follow", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -181,7 +190,6 @@ async function handleGoogleUpload(event) {
         }
     };
 }
-
 
 // =========================================================================
 // 7. INTERACTIVE DISPLAY ADJUSTMENTS
