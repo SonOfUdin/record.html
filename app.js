@@ -1,7 +1,7 @@
 // =========================================================================
 // 1. GOOGLE APPS SCRIPT WEB APP TARGET URL
 // =========================================================================
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/library/d/12kQ3TflxL1bKDRdk1OmbxGMf1gINsrDiMbQyFIQUsEBwjaWOhIwNSuiG/1";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypA1PRhIWcVlIhQ4CEUCJ35wsRkZ_4okbkPHLJkvbPtx5BycoeTPGIo12U6Ty9EBExpw/exec";
 
 // =========================================================================
 // 2. DOM INTERFACE COMPONENT POINTERS
