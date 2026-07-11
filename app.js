@@ -1,7 +1,11 @@
 // =========================================================================
-// 1. GOOGLE APPS SCRIPT WEB APP TARGET URL
+// 1. SECURE SUPABASE INITIALIZATION
 // =========================================================================
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypA1PRhIWcVlIhQ4CEUCJ35wsRkZ_4okbkPHLJkvbPtx5BycoeTPGIo12U6Ty9EBExpw/exec";
+const SUPABASE_URL = "https://ydvfmbvdxgtjtvowmdfj.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdmZtYnZkeGd0anR2b3dtZGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjI1ODcsImV4cCI6MjA5NzAzODU4N30.ihE4GMKmG2f4E9M7xliSH1VvZ3wCiuXw56RLreQNIgU";
+
+// Initializing as supabaseClient fixes the 'supabase has already been declared' error
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // =========================================================================
 // 2. DOM INTERFACE COMPONENT POINTERS
@@ -19,7 +23,7 @@ const canvas = document.getElementById('visualizer-canvas');
 const canvasCtx = canvas ? canvas.getContext('2d') : null;
 
 // =========================================================================
-// 3. MASTER APPLICATION CONTAINER ENTRIES
+// 3. MASTER APPLICATION STATE MATRIX
 // =========================================================================
 let mediaRecorder = null;
 let audioChunks = [];
@@ -34,11 +38,11 @@ let source = null;
 let animationFrameId = null;
 
 // =========================================================================
-// 4. BIND ACTION CAPTURE TRIGGERS
+// 4. ACTION DRIVEN EVENT LISTENERS
 // =========================================================================
 if (btnRecord) btnRecord.addEventListener('click', startRecording);
 if (btnStop) btnStop.addEventListener('click', stopRecording);
-if (metaForm) metaForm.addEventListener('submit', handleGoogleUpload);
+if (metaForm) metaForm.addEventListener('submit', handleSupabaseUpload);
 
 function resizeCanvas() {
     if (!canvas) return;
@@ -49,7 +53,7 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas(); 
 
 // =========================================================================
-// 5. INTERACTIVE FUNCTION CORE LOGIC
+// 5. AUDIO CONTROLLER CORE LOGIC
 // =========================================================================
 
 async function startRecording() {
@@ -78,8 +82,8 @@ async function startRecording() {
         startTimer();
 
     } catch (error) {
-        console.error('Microphone stream error:', error);
-        alert('Microphone Access Blocked! Make sure you are testing on your secure HTTPS GitHub Pages link.');
+        console.error('System Access Denied:', error);
+        alert('Microphone blocked! Ensure you are running on GitHub Pages over HTTPS.');
     }
 }
 
@@ -102,7 +106,7 @@ function drawVisualizer() {
 }
 
 function stopRecording() {
-    stopTimer(); 
+    stopTimer(); // Instantly freezes timer text numbers from incrementing
     if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
 
     mediaRecorder.stop();
@@ -126,75 +130,76 @@ function processAudioOutput() {
 }
 
 // =========================================================================
-// 6. GOOGLE APPS SCRIPT UPLOAD INTERFACE
+// 6. NATIVE SUPABASE UPLOAD HANDLER
 // =========================================================================
 
-async function handleGoogleUpload(event) {
+async function handleSupabaseUpload(event) {
     event.preventDefault(); 
-    if (!audioBlob) return alert('Audio tracking target asset empty.');
+    if (!audioBlob) return alert('Audio tracking asset empty.');
 
-    const nameEl = document.getElementById('user-name');
-    const titleEl = document.getElementById('track-title');
-    const langEl = document.getElementById('audio-language');
-    const ageEl = document.getElementById('user-age-range');
-
-    if (!nameEl || !titleEl || !langEl || !ageEl) {
-        return alert("Configuration Error: One or more dropdown/input element IDs could not be found in your index.html file.");
-    }
-
-    const userName = nameEl.value.trim();
-    const trackTitle = titleEl.value;
-    const trackLanguage = langEl.value;
-    const trackAgeRange = ageEl.value;
+    const userName = document.getElementById('user-name').value.trim();
+    const trackTitle = document.getElementById('track-title').value;
+    const trackLanguage = document.getElementById('audio-language').value;
+    const trackAgeRange = document.getElementById('user-age-range').value;
 
     btnSubmit.disabled = true;
-    btnSubmit.textContent = "Uploading to Google Drive...";
+    btnSubmit.textContent = "Uploading...";
 
-    const reader = new FileReader();
-    reader.readAsDataURL(audioBlob);
-    reader.onloadend = async function () {
-        // ULTIMATE CORRECTION: Safely extract the full Base64 string payload 
-        // after the comma, regardless of the browser's recording format.
-        const rawResult = reader.result;
-        const commaIndex = rawResult.indexOf(",");
-        const base64String = commaIndex !== -1 ? rawResult.substring(commaIndex + 1) : rawResult;
+    const fileExtension = mediaRecorder.mimeType.includes('mp4') ? 'm4a' : 
+                          mediaRecorder.mimeType.includes('webm') ? 'webm' : 'wav';
+    const uniqueFilename = `track_${Date.now()}.${fileExtension}`;
 
-        const payload = {
-            name: userName,
-            title: trackTitle,
-            language: trackLanguage,
-            ageRange: trackAgeRange,
-            audioBase64: base64String, // Sends the fully cleaned file contents
-            mimeType: audioBlob.type
-        };
-
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors", 
-                redirect: "follow", 
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8"
-                },
-                body: JSON.stringify(payload)
+    try {
+        // STEP A: Streams raw data binary directly to your Storage Bucket folder
+        btnSubmit.textContent = "Uploading audio file...";
+        const { data: storageData, error: storageError } = await supabaseClient.storage
+            .from('audio-recordings')
+            .upload(uniqueFilename, audioBlob, {
+                cacheControl: '3600',
+                upsert: false,
+                contentType: audioBlob.type
             });
 
-            alert(`Success!\nRecording by ${userName} submitted successfully.`);
-            metaForm.reset();
-            if (previewSection) previewSection.classList.remove('hidden'); // Keeps preview section visible if needed, change to 'add' to hide
+        if (storageError) throw storageError;
 
-        } catch (err) {
-            console.error("Google Pipeline Error:", err);
-            alert(`Upload Failed: ${err.message || err}`);
-        } finally {
-            btnSubmit.disabled = false;
-            btnSubmit.textContent = "Submit Track";
-        }
-    };
+        // STEP B: Generate public view URL path
+        const { data: publicUrlData } = supabaseClient.storage
+            .from('audio-recordings')
+            .getPublicUrl(uniqueFilename);
+
+        const absoluteAudioUrl = publicUrlData.publicUrl;
+
+        // STEP C: Save clean metadata directly into database columns
+        btnSubmit.textContent = "Saving records...";
+        const { data: tableData, error: tableError } = await supabaseClient
+            .from('cultural_recordings') // Links straight to the new SQL Table name
+            .insert([
+                {
+                    recorder_name: userName,
+                    topic_selected: trackTitle,
+                    language_spoken: trackLanguage,
+                    age_group: trackAgeRange,
+                    audio_url: absoluteAudioUrl
+                }
+            ]);
+
+        if (tableError) throw tableError;
+
+        alert(`Success!\nRecording by ${userName} saved permanently to Supabase cloud logs.`);
+        metaForm.reset();
+        if (previewSection) previewSection.classList.add('hidden');
+
+    } catch (err) {
+        console.error("Supabase Operation Failure:", err);
+        alert(`Submission Failed: ${err.message || err}`);
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Submit Track";
+    }
 }
 
 // =========================================================================
-// 7. INTERACTIVE DISPLAY ADJUSTMENTS
+// 7. UTILITY DISPLAY ROUTINES
 // =========================================================================
 
 function updateUIState(isRecording) {
