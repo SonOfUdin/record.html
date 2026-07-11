@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recorder</title>
+    <title>Cultural Audio Recorder Platform</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="recorder-container">
         <header class="recorder-header">
-            <h1>Wave Recorder</h1>
+            <h1>Studio Recorder</h1>
             <span id="status-tag" class="status-tag idle">Ready</span>
         </header>
 
@@ -20,12 +20,10 @@
         </div>
 
         <div class="controls-container">
-            <button id="btn-record" class="btn btn-record" title="Start Recording">
+            <button id="btn-record" class="btn btn-record">
                 <span class="icon-dot"></span> Record
             </button>
-            <button id="btn-stop" class="btn btn-stop" disabled title="Stop Recording">
-                Stop
-            </button>
+            <button id="btn-stop" class="btn btn-stop" disabled>Stop</button>
         </div>
 
         <div id="preview-section" class="preview-section hidden">
@@ -34,14 +32,14 @@
             
             <form id="meta-form" class="meta-form">
                 <div class="form-group">
-                    <label for="user-name">Name (Surname First</label>
+                    <label for="user-name">Name (Surname First)</label>
                     <input type="text" id="user-name" placeholder="e.g. Ekiugbo, Philip Oghenesuowho" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="track-title">Topic</label>
                     <select id="track-title" required>
-                      <option value="" disabled selected>Select your topic...</option>
+                        <option value="" disabled selected>Select your topic...</option>
                         <option value="Festival">A festival in my culture</option>
                         <option value="Meal">How to prepare my favourite native food</option>
                         <option value="Medicine">How to prepare a traditional medicine for treating any ailment</option>
@@ -67,13 +65,14 @@
                         <option value="Ukwuani">Ukwuani</option>
                         <option value="Urhobo">Urhobo</option>
                         <option value="Yoruba">Yoruba</option>
-                       <option value="Other">Other</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                      <label for="user-age-range">Age Range</label>
-                    <select id="user-age-range" required>
-                      <option value="" disabled selected>Select your age range...</option>
+                     <select id="user-age-range" required>
+                        <option value="" disabled selected>Select your age range...</option>
                         <option value="14 - 19">14 - 19</option>
                         <option value="20 - 24">20 - 24</option>
                         <option value="25 - 29">25 - 29</option>
@@ -89,15 +88,8 @@
         </div>
     </div>
 
-
-<!-- Increment to ?v=4 to completely wipe out the cached JavaScript memory -->
-    <script src="app.js?v=4"></script>
+    <!-- Official Supabase JS Browser Bundle Dependency -->
+    <script src="https://jsdelivr.net"></script>
+    <script src="app.js?v=10"></script>
 </body>
 </html>
-
-
-
-
-
-
-
