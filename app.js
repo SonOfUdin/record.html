@@ -133,19 +133,17 @@ async function handleGoogleUpload(event) {
     event.preventDefault(); 
     if (!audioBlob) return alert('Audio tracking target asset empty.');
 
-    // Fail-safe element selector configuration
     const nameEl = document.getElementById('user-name');
     const titleEl = document.getElementById('track-title');
     const langEl = document.getElementById('audio-language');
     const ageEl = document.getElementById('user-age-range');
 
-    // Verification checkpoint to alert you if an HTML ID is missing
     if (!nameEl || !titleEl || !langEl || !ageEl) {
         return alert("Configuration Error: One or more dropdown/input element IDs could not be found in your index.html file.");
     }
 
     const userName = nameEl.value.trim();
-    const trackTitle = titleEl.value.trim();
+    const trackTitle = titleEl.value;
     const trackLanguage = langEl.value;
     const trackAgeRange = ageEl.value;
 
@@ -155,19 +153,23 @@ async function handleGoogleUpload(event) {
     const reader = new FileReader();
     reader.readAsDataURL(audioBlob);
     reader.onloadend = async function () {
-        const base64String = reader.result;
+        // ULTIMATE CORRECTION: Safely extract the full Base64 string payload 
+        // after the comma, regardless of the browser's recording format.
+        const rawResult = reader.result;
+        const commaIndex = rawResult.indexOf(",");
+        const base64String = commaIndex !== -1 ? rawResult.substring(commaIndex + 1) : rawResult;
 
         const payload = {
             name: userName,
             title: trackTitle,
             language: trackLanguage,
             ageRange: trackAgeRange,
-            audioBase64: base64String,
+            audioBase64: base64String, // Sends the fully cleaned file contents
             mimeType: audioBlob.type
         };
 
         try {
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
+            await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors", 
                 redirect: "follow", 
@@ -177,9 +179,9 @@ async function handleGoogleUpload(event) {
                 body: JSON.stringify(payload)
             });
 
-            alert(`Success!\nTrack data dispatched into your Google pipeline loop.`);
+            alert(`Success!\nRecording by ${userName} submitted successfully.`);
             metaForm.reset();
-            if (previewSection) previewSection.classList.add('hidden');
+            if (previewSection) previewSection.classList.remove('hidden'); // Keeps preview section visible if needed, change to 'add' to hide
 
         } catch (err) {
             console.error("Google Pipeline Error:", err);
