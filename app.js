@@ -1,29 +1,18 @@
 // =========================================================================
-// 1. SECURE SUPABASE INITIALIZATION
-// =========================================================================
-const SUPABASE_URL = "https://ydvfmbvdxgtjtvowmdfj.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdmZtYnZkeGd0anR2b3dtZGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjI1ODcsImV4cCI6MjA5NzAzODU4N30.ihE4GMKmG2f4E9M7xliSH1VvZ3wCiuXw56RLreQNIgU";
-
-// Initializing as supabaseClient fixes the 'supabase has already been declared' error
-const supabaseClient = supabase.createClient(https://ydvfmbvdxgtjtvowmdfj.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdmZtYnZkeGd0anR2b3dtZGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjI1ODcsImV4cCI6MjA5NzAzODU4N30.ihE4GMKmG2f4E9M7xliSH1VvZ3wCiuXw56RLreQNIgU);
-
-// =========================================================================
-// 2. DOM INTERFACE COMPONENT POINTERS
+// 1. DOM INTERFACE COMPONENT POINTERS
 // =========================================================================
 const btnRecord = document.getElementById('btn-record');
 const btnStop = document.getElementById('btn-stop');
-const btnSubmit = document.getElementById('btn-submit');
 const btnDownload = document.getElementById('btn-download');
 const timerDisplay = document.getElementById('timer');
 const statusTag = document.getElementById('status-tag');
 const previewSection = document.getElementById('preview-section');
 const audioPreview = document.getElementById('audio-preview');
-const metaForm = document.getElementById('meta-form');
 const canvas = document.getElementById('visualizer-canvas');
 const canvasCtx = canvas ? canvas.getContext('2d') : null;
 
 // =========================================================================
-// 3. MASTER APPLICATION STATE MATRIX
+// 2. RECORDER & VISUALIZER STATE trackers
 // =========================================================================
 let mediaRecorder = null;
 let audioChunks = [];
@@ -38,11 +27,10 @@ let source = null;
 let animationFrameId = null;
 
 // =========================================================================
-// 4. ACTION DRIVEN EVENT LISTENERS
+// 3. ACTION EVENT BINDINGS
 // =========================================================================
 if (btnRecord) btnRecord.addEventListener('click', startRecording);
 if (btnStop) btnStop.addEventListener('click', stopRecording);
-if (metaForm) metaForm.addEventListener('submit', handleSupabaseUpload);
 
 function resizeCanvas() {
     if (!canvas) return;
@@ -53,11 +41,11 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas(); 
 
 // =========================================================================
-// 5. AUDIO CONTROLLER CORE LOGIC
+// 4. CORE ENGINE RETAINED LOGIC
 // =========================================================================
 
 async function startRecording() {
-    audioChunks = []; 
+    audioChunks = []; // Clear historical buffer frames
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
             audio: { echoCancellation: true, noiseSuppression: true } 
@@ -82,8 +70,8 @@ async function startRecording() {
         startTimer();
 
     } catch (error) {
-        console.error('System Access Denied:', error);
-        alert('Microphone blocked! Ensure you are running on GitHub Pages over HTTPS.');
+        console.error('System Access Fault:', error);
+        alert('Microphone Access Blocked! Make sure you are viewing this page on your live HTTPS GitHub Pages URL.');
     }
 }
 
@@ -106,7 +94,7 @@ function drawVisualizer() {
 }
 
 function stopRecording() {
-    stopTimer(); // Instantly freezes timer text numbers from incrementing
+    stopTimer(); // Halt timer text calculations instantly on click
     if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
 
     mediaRecorder.stop();
@@ -124,83 +112,12 @@ function processAudioOutput() {
     if (audioPreview) audioPreview.src = audioUrl;
     if (btnDownload) {
         btnDownload.href = audioUrl;
-        btnDownload.setAttribute('download', 'recording.wav');
+        
+        // Dynamically name file with timestamp to prevent students from overwriting takes
+        btnDownload.setAttribute('download', `take_${Date.now()}.wav`);
     }
     if (previewSection) previewSection.classList.remove('hidden');
 }
-
-// =========================================================================
-// 6. NATIVE SUPABASE UPLOAD HANDLER
-// =========================================================================
-
-async function handleSupabaseUpload(event) {
-    event.preventDefault(); 
-    if (!audioBlob) return alert('Audio tracking asset empty.');
-
-    const userName = document.getElementById('user-name').value.trim();
-    const trackTitle = document.getElementById('track-title').value;
-    const trackLanguage = document.getElementById('audio-language').value;
-    const trackAgeRange = document.getElementById('user-age-range').value;
-
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = "Uploading...";
-
-    const fileExtension = mediaRecorder.mimeType.includes('mp4') ? 'm4a' : 
-                          mediaRecorder.mimeType.includes('webm') ? 'webm' : 'wav';
-    const uniqueFilename = `track_${Date.now()}.${fileExtension}`;
-
-    try {
-        // STEP A: Streams raw data binary directly to your Storage Bucket folder
-        btnSubmit.textContent = "Uploading audio file...";
-        const { data: storageData, error: storageError } = await supabaseClient.storage
-            .from('audio-recordings')
-            .upload(uniqueFilename, audioBlob, {
-                cacheControl: '3600',
-                upsert: false,
-                contentType: audioBlob.type
-            });
-
-        if (storageError) throw storageError;
-
-        // STEP B: Generate public view URL path
-        const { data: publicUrlData } = supabaseClient.storage
-            .from('audio-recordings')
-            .getPublicUrl(uniqueFilename);
-
-        const absoluteAudioUrl = publicUrlData.publicUrl;
-
-        // STEP C: Save clean metadata directly into database columns
-        btnSubmit.textContent = "Saving records...";
-        const { data: tableData, error: tableError } = await supabaseClient
-            .from('cultural_recordings') // Links straight to the new SQL Table name
-            .insert([
-                {
-                    recorder_name: userName,
-                    topic_selected: trackTitle,
-                    language_spoken: trackLanguage,
-                    age_group: trackAgeRange,
-                    audio_url: absoluteAudioUrl
-                }
-            ]);
-
-        if (tableError) throw tableError;
-
-        alert(`Success!\nRecording by ${userName} saved permanently to Supabase cloud logs.`);
-        metaForm.reset();
-        if (previewSection) previewSection.classList.add('hidden');
-
-    } catch (err) {
-        console.error("Supabase Operation Failure:", err);
-        alert(`Submission Failed: ${err.message || err}`);
-    } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = "Submit Track";
-    }
-}
-
-// =========================================================================
-// 7. UTILITY DISPLAY ROUTINES
-// =========================================================================
 
 function updateUIState(isRecording) {
     if (isRecording) {
