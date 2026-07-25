@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cultural Audio Recorder Platform</title>
+    <title>Studio Audio Recorder</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,82 +14,40 @@
             <span id="status-tag" class="status-tag idle">Ready</span>
         </header>
 
+        <!-- Dynamic canvas visualizer block -->
         <div class="visualizer-container">
             <div id="timer" class="timer">00:00</div>
             <canvas id="visualizer-canvas" class="visualizer-canvas"></canvas>
         </div>
 
+        <!-- Master system interactive buttons -->
         <div class="controls-container">
-            <button id="btn-record" class="btn btn-record">
+            <button id="btn-record" class="btn btn-record" title="Start Recording">
                 <span class="icon-dot"></span> Record
             </button>
-            <button id="btn-stop" class="btn btn-stop" disabled>Stop</button>
+            <button id="btn-stop" class="btn btn-stop" disabled title="Stop Recording">
+                Stop
+            </button>
         </div>
 
+        <!-- Download & Instructions Action Card -->
         <div id="preview-section" class="preview-section hidden">
-            <h3>Latest Recording</h3>
+            <h3>Your Recording is Ready!</h3>
             <audio id="audio-preview" controls></audio>
             
-            <form id="meta-form" class="meta-form">
-                <div class="form-group">
-                    <label for="user-name">Name (Surname First)</label>
-                    <input type="text" id="user-name" placeholder="e.g. Ekiugbo, Philip Oghenesuowho" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="track-title">Topic</label>
-                    <select id="track-title" required>
-                        <option value="" disabled selected>Select your topic...</option>
-                        <option value="Festival">A festival in my culture</option>
-                        <option value="Meal">How to prepare my favourite native food</option>
-                        <option value="Medicine">How to prepare a traditional medicine for treating any ailment</option>
-                        <option value="Marriage">How traditional marriages are done in my culture</option>
-                        <option value="Burial">How traditional burials are conducted in my culture</option>
-                    </select>
-                </div>
+            <div class="instructions-card">
+                <p><strong>Step 1:</strong> Click the <strong>Download Recording</strong> button below to save your audio track to your device.</p>
+                <p><strong>Step 2:</strong> Fill out the form fields and upload your downloaded file into the submission link.</p>
+            </div>
 
-                <div class="form-group">
-                    <label for="audio-language">Language</label>
-                    <select id="audio-language" required>
-                        <option value="" disabled selected>Select your language...</option>
-                        <option value="Edo">Edo</option>
-                        <option value="Esan">Esan</option>
-                        <option value="Etsako">Etsako</option>
-                        <option value="Ibibio">Ibibio</option>
-                        <option value="Igbanke">Igbanke</option>
-                        <option value="Igbo">Igbo</option>
-                        <option value="Isoko">Isoko</option>
-                        <option value="Itsekiri">Itsekiri</option>
-                        <option value="Nigerian Pidgin">Nigerian Pidgin</option>
-                        <option value="Ora">Ora</option>
-                        <option value="Ukwuani">Ukwuani</option>
-                        <option value="Urhobo">Urhobo</option>
-                        <option value="Yoruba">Yoruba</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                     <label for="user-age-range">Age Range</label>
-                     <select id="user-age-range" required>
-                        <option value="" disabled selected>Select your age range...</option>
-                        <option value="14 - 19">14 - 19</option>
-                        <option value="20 - 24">20 - 24</option>
-                        <option value="25 - 29">25 - 29</option>
-                        <option value="30 - 35">30 - 35</option>
-                    </select>
-                </div>
-
-                <div class="action-buttons">
-                    <a id="btn-download" class="btn btn-download" download="recording.wav">Download</a>
-                    <button type="submit" id="btn-submit" class="btn btn-submit">Submit Track</button>
-                </div>
-            </form>
+            <div class="action-buttons">
+                <a id="btn-download" class="btn btn-download" download="recording.wav">Download Recording</a>
+                <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" id="btn-submit-form" class="btn btn-submit">Open Submission Form</a>
+            </div>
         </div>
     </div>
 
-    <!-- Official Supabase JS Browser Bundle Dependency -->
-    <script src="https://jsdelivr.net"></script>
-    <script src="app.js?v=10"></script>
+    <!-- Custom isolated script controller -->
+    <script src="app.js?v=offline_v1"></script>
 </body>
 </html>
